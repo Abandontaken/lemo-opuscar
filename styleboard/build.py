@@ -116,7 +116,7 @@ def readme_pic(href, base, zh, alt, width='100%'):
 def readme_cards(items, cols, zh):
     """Cards as readme.mjs draws them: per row, the posters (one picture each, the same in both themes), a break, the captions
     (themed), a break. items: [(href, base, alt)]; the posters are <base>-poster.webp. No whitespace: the gutters are in the pictures."""
-    d, w = README_ART['dir'], f'{100 / cols:.2f}%'
+    d, w = README_ART['dir'], f'{int(10000 / cols) / 100:.2f}%'   # rounded down: 6 × 16.67% is past 100% and GitHub wraps the last card
     rows = [items[i:i + cols] for i in range(0, len(items), cols)]
     return '<br>'.join(''.join(f'<a href="{h}">{_img(f"{d}/{b}-poster.webp", a, w)}</a>' for h, b, a in r) + '<br>' +
                        ''.join(readme_pic(h, b, zh, '', w) for h, b, a in r) for r in rows)
@@ -159,11 +159,11 @@ def readme_styles(zh):
 
 
 def readme_thanks(zh):
-    """Between <!-- thanks:start --> and <!-- thanks:end -->: the thank-you films (THANKS in styleboard/gallery.py) as cards, in one row."""
+    """Between <!-- thanks:start --> and <!-- thanks:end -->: the thank-you films (THANKS in styleboard/gallery.py) as cards, thanks_cols to a row."""
     import gallery
     site = SITE_URL + ('zh/' if zh else '')
     return '\n' + readme_cards([(f'{site}thanks/#{i}', 'thanks/' + i, t[zh] + (f"（{d}）" if zh else f" ({d})")) for i, d, _, t, _ in gallery.THANKS],
-                               len(gallery.THANKS), zh) + '\n'
+                               min(len(gallery.THANKS), README_ART['thanks_cols']), zh) + '\n'
 
 
 def station_anchors():
